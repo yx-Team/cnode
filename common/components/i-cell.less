@@ -1,0 +1,52 @@
+
+.i-cell-group{
+	position: relative;
+	background: #fff;
+	&:after{
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 1px;
+		background:#eee;
+		transform: scaleY(0.5);
+	}
+}
+.i-cell{
+	position: relative;
+	padding: 24upx 32upx;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	&:after{
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 1px;
+		background:#eee;
+		transform: scaleY(0.5);
+	}
+	&:last-child:after{
+		height: 0;
+	}
+	&__left{
+		display: flex;
+		
+	}
+	&__right{
+		display: flex;
+		color: #999;
+	}
+	&__icon{
+		margin-right: 10upx;
+	}
+	&__text{
+		font-size: 28upx;
+	}
+	&--hover{
+		background: #eee;
+	}
+}

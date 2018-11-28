@@ -1,0 +1,74 @@
+{
+    "pages" : [
+        //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+        {
+            "path" : "pages/home/index",
+            "style" : {
+                "navigationBarTitleText" : "CNode"
+            }
+        },
+        {
+            "path" : "pages/fabu/index",
+            "style" : {
+                "navigationBarTitleText" : "发布"
+            }
+        },
+        {
+            "path" : "pages/message/index",
+            "style" : {
+                "navigationBarTitleText" : "消息"
+            }
+        },
+        {
+            "path" : "pages/me/index",
+            "style" : {
+                "navigationBarTitleText" : "我的"
+            }
+        },
+        {
+            "path" : "pages/login/index",
+            "style" : {
+            	"navigationBarTitleText" : ""
+				
+            }
+        }
+    ],
+    "globalStyle" : {
+        "navigationBarTextStyle" : "white",
+        "navigationBarTitleText" : "CNode",
+        "navigationBarBackgroundColor" : "#457bbe",
+        "backgroundColor" : "#F8F8F8"
+    },
+    "tabBar" : {
+        "color" : "#666666",
+        "selectedColor" : "#457bbe",
+        "borderStyle" : "black",
+        "backgroundColor" : "#ffffff",
+        "list" : [
+            {
+                "pagePath" : "pages/home/index",
+                "iconPath" : "static/images/home@2x.png",
+                "selectedIconPath" : "static/images/home-1@2x.png",
+                "text" : "首页"
+            },
+            {
+                "pagePath" : "pages/fabu/index",
+                "iconPath" : "static/images/fabu@2x.png",
+                "selectedIconPath" : "static/images/fabu-1@2x.png",
+                "text" : "发布"
+            },
+            {
+                "pagePath" : "pages/message/index",
+                "iconPath" : "static/images/message@2x.png",
+                "selectedIconPath" : "static/images/message-1@2x.png",
+                "text" : "消息"
+            },
+            {
+                "pagePath" : "pages/me/index",
+                "iconPath" : "static/images/me@2x.png",
+                "selectedIconPath" : "static/images/me-1@2x.png",
+                "text" : "我的"
+            }
+        ]
+    }
+}
