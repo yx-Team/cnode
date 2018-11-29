@@ -1,152 +1,360 @@
 <template>
-    <view class="uni-tab-bar">
-        <scroll-view id="tab-bar" class="uni-swiper-tab" scroll-x :scroll-left="scrollLeft">
-            <view v-for="(tab,index) in tabBars" :key="tab.id" :class="['swiper-tab-list',tabIndex==index ? 'active' : '']"
-                :id="tab.id" :data-current="index" @tap="tapTab">{{tab.name}}</view>
-        </scroll-view>
-        <view class="swiper-box">
-			
+    <view class="page-home">
+		<!-- tab -->
+		<!-- #ifdef H5 -->
+		<scroll-view class="page-home-vscroll fixed-top" :scroll-x="true">
+		<!-- #endif -->
+		<!-- #ifndef H5 -->
+		<scroll-view class="page-home-vscroll" :scroll-x="true">
+		<!-- #endif -->
+		
+			<view class="page-home-vscroll__item" 
+				:class="{'is-active':tabIndex===item.id}" 
+				v-for="(item,index) in tabBars" 
+				:key="index"
+				@click="tabHandle(item.id)"
+				>
+				<view class="page-home-vscroll__text">
+					{{item.name}}
+				</view>
+			</view>
+		</scroll-view>
+		<!-- cell -->
+        <i-cell-group>
+			<i-cell :arrow="false">为您推荐</i-cell>
+		</i-cell-group>
+		<!-- list -->
+		<view class="article-list">
+			<!-- <view class="article-list__item" hover-class="is-hover">
+				<view class="article-list__userinfo">
+					<view class="article-list__userinfo--left">
+						<view class="article-list__avatar"><image src="../../static/logo.png" ></image></view>
+						<view class="article-list__username">Mr.xasd</view>
+					</view>
+					<view class="article-list__time">1小时前</view>
+				</view>
+				<view class="article-list__title i-ellipsis">Egg 2.0 正式发布，性能提升 30%，拥抱 Async,更加规范，更加快速</view>
+				<view class="article-list__desc i-ellipsis-2">Egg 是阿里 Node.js 的核心基础框架，面向『企业级的 Web 基础框架』这个领域，提供了「微内核 + 插件机制 + 框架定制能力」，完美达成生态共建和差异化定制的平衡点。</view>
+				<view class="article-list__footer">
+					<view class="article-list__label good">精华</view>
+					<view class="article-list__fnum"><view class="iconfont icon-eye"></view>326</view>
+					<view class="article-list__fnum"><view class="iconfont icon-pinglun"></view>326</view>
+				</view>
+			</view> -->
+			<view class="article-list__item" hover-class="is-hover" v-for="(item,index) in currentData">
+				<view class="article-list__userinfo">
+					<view class="article-list__userinfo--left">
+						<view class="article-list__avatar"><image :src="item.author.avatar_url" ></image></view>
+						<view class="article-list__username">{{item.author.loginname}}</view>
+					</view>
+					<view class="article-list__time">{{item.create_at}}</view>
+				</view>
+				<view class="article-list__title i-ellipsis">{{item.title}}</view>
+				<view class="article-list__desc i-ellipsis-2">{{item.content}}</view>
+				<view class="article-list__footer">
+					<view class="article-list__label" :class="item.tab">分享</view>
+					<view class="article-list__fnum"><view class="iconfont icon-eye"></view>{{item.visit_count}}</view>
+					<view class="article-list__fnum"><view class="iconfont icon-pinglun"></view>{{item.reply_count}}</view>
+				</view>
+			</view>
 		</view>
+		
     </view>
 </template>
 <script>
-    import mediaList from '@/components/tab-nvue/mediaList.vue';
-	import uniLoadMore from '@/components/uni-load-more.vue';
-    export default {
-        components: {
-            mediaList,
-			uniLoadMore
-        },
-        data() {
-            return {
-				loadingText: {
-					contentdown: "上拉显示更多",
-					contentrefresh: "正在加载...",
-					contentnomore: "没有更多数据了"
-				},
-               
-                tabBars: [{
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import 'dayjs/locale/zh-cn' 
+dayjs.locale('zh-cn')
+dayjs.extend(relativeTime)
+import {interfaces} from '@/common/api.js'
+import iCellGroup from '@/components/i-cell-group.vue';
+import iCell from '@/components/i-cell.vue';
+export default {
+    components: {
+        iCellGroup,
+        iCell
+    },
+    data() {
+        return {
+            loadingText: {
+                contentdown: '上拉显示更多',
+                contentrefresh: '正在加载...',
+                contentnomore: '没有更多数据了'
+            },
+			tabIndex:'all',
+            tabBars: [
+                {
                     name: '全部',
                     id: 'all'
-                }, {
+                },
+                {
                     name: '精华',
                     id: 'good'
-                }, {
+                },
+                {
                     name: '分享',
                     id: 'share'
-                }, {
+                },
+                {
                     name: '问答',
                     id: 'ask'
-                }, {
+                },
+                {
                     name: '招聘',
                     id: 'job'
-                }, {
+                },
+                {
                     name: '测试',
                     id: 'dev'
-                }]
-            }
-        },
-        onLoad: function() {
-            this.newsitems = this.randomfn()
-        },
-        methods: {
-            goDetail(e) {
-                uni.navigateTo({
-                    url: '/pages/template/tabbar/detail/detail?data=' + e.title
-                })
-            },
-            close(index1, index2) {
-                uni.showModal({
-                    content: '是否删除本条信息？',
-                    success: (res) => {
-                        if (res.confirm) {
-                            this.newsitems[index1].data.splice(index2, 1);
-                        }
-                    }
-                })
-            },
-            loadMore(e) {
-				this.newsitems[e].loadingType = 1;
-            	setTimeout(() => {
-            		this.addData(e);
-            	}, 1200);
-            },
-            addData(e) {
-            	if (this.newsitems[e].data.length > 30) {
-					this.newsitems[e].loadingType = 2;
-            		return;
-            	}
-            	for (let i = 1; i <= 10; i++) {
-            		this.newsitems[e].data.push(this['data' + Math.floor(Math.random() * 5)]);
-            	}
-				this.newsitems[e].loadingType = 1;
-            },
-            async changeTab(e) {
-                let index = e.target.current;
-                if (this.isClickChange) {
-                    this.tabIndex = index;
-                    this.isClickChange = false;
-                    return;
                 }
-                let tabBar = await this.getElSize("tab-bar"),
-                    tabBarScrollLeft = tabBar.scrollLeft;
-                let width = 0;
+            ],
+			list:{
+				'all':[],
+				'good':[],
+				'share':[],
+				'ask':[],
+				'job':[],
+				'dev':[]
+			},
+			currentData:[]
+        };
+    },
+    onLoad: function() {
+		var self = this;
+		var id='all';
+		uni.request({
+			url:interfaces.topics,
+			data:{
+				limit:5,
+				tab:'all',
+				mdrender:false
+			},
+			success(res) {
+				if(res.statusCode>=200 && res.statusCode<300){
+					
+					self.list[id]=res.data.data.map((item)=>{
+						item.create_at=dayjs().to(dayjs(item.create_at))
+						return item
+					})
+					self.currentData=self.list[id]
+				}
+				
+			}
+		})
+	},
+	onPageScroll(e) {
+		
+	},
+    methods: {
+		tabHandle(id){
+			let self = this;
+			self.tabIndex=id
+			let data = {
+				all:'all',
+				good:'good',
+				share:'share',
+				ask:'ask',
+				job:'job',
+				dev:'dev'
+			}
+			if(self.list[id].length){
+				self.currentData=self.list[id]
+			}else{
+				uni.request({
+					url:interfaces.topics,
+					data:{
+						limit:5,
+						tab:data[id],
+						mdrender:false
+					},
+					success(res) {
+						if(res.statusCode>=200 && res.statusCode<300){
+							self.list[id]=res.data.data.map((item)=>{
+								item.create_at=dayjs().to(dayjs(item.create_at))
+								return item
+							})
+							self.currentData=self.list[id]
+							// self.currentData=res.data.data
+							// self.list[id] = res.data.data
+						}
+						
+					}
+				})
+			}
+			
+		}
+	}
+};
+</script>
 
-                for (let i = 0; i < index; i++) {
-                    let result = await this.getElSize(this.tabBars[i].id);
-                    width += result.width;
-                }
-                let winWidth = uni.getSystemInfoSync().windowWidth,
-                    nowElement = await this.getElSize(this.tabBars[index].id),
-                    nowWidth = nowElement.width;
-                if (width + nowWidth - tabBarScrollLeft > winWidth) {
-                    this.scrollLeft = width + nowWidth - winWidth;
-                }
-                if (width < tabBarScrollLeft) {
-                    this.scrollLeft = width;
-                }
-                this.isClickChange = false;
-                this.tabIndex = index; //一旦访问data就会出问题
-            },
-            getElSize(id) { //得到元素的size
-                return new Promise((res, rej) => {
-                    uni.createSelectorQuery().select("#" + id).fields({
-                        size: true,
-                        scrollOffset: true
-                    }, (data) => {
-                        res(data);
-                    }).exec();
-                })
-            },
-            async tapTab(e) { //点击tab-bar
-                if (this.tabIndex === e.target.dataset.current) {
-                    return false;
-                } else {
-                    let tabBar = await this.getElSize("tab-bar"),
-                        tabBarScrollLeft = tabBar.scrollLeft; //点击的时候记录并设置scrollLeft
-                    this.scrollLeft = tabBarScrollLeft;
-                    this.isClickChange = true;
-                    this.tabIndex = e.target.dataset.current
-                }
-            },
-            randomfn() {
-                let ary = [];
-                for (let i = 0, length = this.tabBars.length; i < length; i++) {
-                    let aryItem = {
-						loadingType : 0,
-                        data: []
-                    };
-                    for (let j = 1; j <= 10; j++) {
-                        aryItem.data.push(this['data' + Math.floor(Math.random() * 5)]);
-                    }
-                    ary.push(aryItem);
-                }
-                return ary;
+<style lang="less">
+.page-home {
+	// tab 水平滚动
+	padding-top: 100upx;
+    &-vscroll {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0px;
+		z-index: 2;
+        height: 100upx;
+        width: 100%;
+        white-space: nowrap;
+        overflow: auto;
+        background: rgb(69, 123, 190);
+		&.fixed-top{
+			top: 44px;
+		}
+        &__item {
+            display: inline-block;
+            width: 120upx;
+            text-align: center;
+            line-height: 100upx;
+            margin-right: 20upx;
+            color: #fff;
+			outline: none;
+        }
+        &__text {
+            position: relative;
+            display: inline;
+        }
+        .is-active {
+            .page-home-vscroll__text:after {
+                position: absolute;
+                left: 50%;
+                bottom: -32upx;
+                transform: translateX(-50%);
+                content: '';
+                height: 6upx;
+                width: 60upx;
+                background: #fff;
             }
         }
     }
-</script>
+    
+	// cell
+	.i-cell {
+        position: relative;
+        &:after {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 5upx;
+            height: 40upx;
+            margin-top: -20upx;
+            background-color: #457bbe;
+        }
+    }
+}
 
-<style>
-
+.article-list{
+	background: #fff;
+	&__item{
+		position: relative;
+		padding: 20upx 30upx 30upx 30upx;
+		&.is-hover{
+			background: #f8f8f8;
+		}
+		&:after{
+			content: '';
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			height: 1px;
+			background:#eee;
+			transform: scaleY(0.5);
+		}
+	}
+	&__userinfo{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		height: 40upx;
+		font-size: 30upx;
+		color: #545454;
+		&--left{
+			display: flex;
+			align-items: center;
+			height: 40upx;
+		}
+	}
+	&__avatar{
+		width: 40upx;
+		height: 40upx;
+		border-radius: 50%;
+		overflow: hidden;
+		background-color: #a1e6f7;
+		margin-right: 20upx;
+		image{
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+	}
+	&__time{
+		color: #c5c5c5;
+	}
+	&__title{
+		font-size: 30upx;
+		margin-top: 25upx;
+		margin-bottom: 18upx;
+		color: #333333;
+	}
+	&__desc{
+		font-size: 24upx;
+		line-height: 36upx;
+		color: #a2a2a2;
+	}
+	&__footer{
+		position: relative;
+		display: flex;
+		height: 28upx;
+		padding-top: 20upx;
+		margin-top: 28upx;
+		&:after{
+			position: absolute;
+			left: 0;
+			top: 0;
+			content: '';
+			width: 50upx;
+			height: 1px;
+			background: #d6d9e1;
+		}
+	}
+	&__label{
+		width: 60upx;
+		height: 32upx;
+		line-height: 32upx;
+		background-color: #49caca;
+		border-radius: 8upx;
+		font-size: 18upx;
+		text-align: center;
+		color: #ffffff;
+		&.good{
+			background-color: #49caca;
+		}
+		&.share{
+			background-color: #ff9900;
+		}
+		&.ask{
+			background-color: #86cdff;
+		}
+		&.job{
+			background-color: #49caca;
+		}
+	}
+	&__fnum{
+		display: flex;
+		height: 28upx;
+		align-items: center;
+		font-size: 22upx;
+		color: #c5c5c5;
+		padding-left: 20upx;
+		.iconfont{
+			margin-right: 8upx;
+		}
+	}
+}
 </style>

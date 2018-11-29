@@ -13,15 +13,14 @@
 </script>
 
 <style lang="less">
-	@import "common/uni.css";
+	// @import "common/uni.css";
 	@import "common/ui.less";
-	@import '//at.alicdn.com/t/font_939291_lnlocncyiq.css';
+	
 	@import "static/css/app.css";
 	
 	/*每个页面公共css */
 	page {
 		background-color:#F4F5F6;
-		height: 100%;
 		font-size:28upx;
 		line-height: 1.8;
 	}

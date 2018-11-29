@@ -1,0 +1,26 @@
+{
+  "name": "cnode",
+  "version": "1.0.0",
+  "description": "cnode",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yx-Team/cnode.git"
+  },
+  "keywords": [
+    "cnode",
+    "uniapp"
+  ],
+  "author": "afei",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yx-Team/cnode/issues"
+  },
+  "homepage": "https://github.com/yx-Team/cnode#readme",
+  "dependencies": {
+    "dayjs": "^1.7.7"
+  }
+}

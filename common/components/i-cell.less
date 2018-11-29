@@ -2,6 +2,16 @@
 .i-cell-group{
 	position: relative;
 	background: #fff;
+	&:before{
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		height: 1px;
+		background:#eee;
+		transform: scaleY(0.5);
+	}
 	&:after{
 		content: '';
 		position: absolute;

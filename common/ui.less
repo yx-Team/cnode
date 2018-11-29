@@ -1,10 +1,10 @@
+
+
 @font-face {
-  font-family: 'iconfont';  /* project id 939291 */
-  src: url('//at.alicdn.com/t/font_939291_lnlocncyiq.eot');
-  src: url('//at.alicdn.com/t/font_939291_lnlocncyiq.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_939291_lnlocncyiq.woff') format('woff'),
-  url('//at.alicdn.com/t/font_939291_lnlocncyiq.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_939291_lnlocncyiq.svg#iconfont') format('svg');
+	font-family: 'iconfont'; 
+	font-weight: normal;
+	font-style: normal;
+	src: url('https://at.alicdn.com/t/font_939291_rubqx7jzh4.ttf') format('truetype');
 }
 .iconfont {
   font-family:"iconfont" !important;
@@ -13,12 +13,66 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.icon-liuyan:before { content: "\e743"; }
+
+.icon-liuyan-o:before { content: "\e744"; }
+
+.icon-exclamationcircle:before { content: "\ee5d"; }
+
+.icon-home:before { content: "\ee8f"; }
+
+.icon-star:before { content: "\ee91"; }
+
+.icon-staro:before { content: "\ee92"; }
+
+.icon-sharealt:before { content: "\eea4"; }
+
+.icon-eye:before { content: "\eebb"; }
+
+.icon-edit:before { content: "\eec6"; }
+
+.icon-appstore:before { content: "\eeca"; }
+
+.icon-like:before { content: "\eed2"; }
+
+.icon-more_android_light:before { content: "\e7e3"; }
+
+.icon-gengduo:before { content: "\e604"; }
+
+.icon-xiaoxi:before { content: "\e624"; }
+
+.icon-touxiang:before { content: "\e621"; }
+
+.icon-pinglun:before { content: "\e605"; }
 /*通用 */
 view{
 	font-size:28upx; 
 	line-height:1.8;
 }
-
+/*去除滚动条*/ 
+::-webkit-scrollbar{
+	width: 0;
+	height: 0;
+}
+/*底部tabbar*/ 
+uni-tabbar .uni-tabbar__icon{
+	width: 50upx;
+	height: 50upx;
+}
+/*文字*/ 
+.i-ellipsis{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space:nowrap;
+}
+.i-ellipsis-2{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
 @import 'components/i-cell.less';
 
 .i-whitespace{
