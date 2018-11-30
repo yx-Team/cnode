@@ -9,10 +9,10 @@
 		<!-- #endif -->
 		
 			<view class="page-home-vscroll__item" 
-				:class="{'is-active':tabIndex===item.id}" 
+				:class="{'is-active':tabIndex===index}" 
 				v-for="(item,index) in tabBars" 
 				:key="index"
-				@click="tabHandle(item.id)"
+				@click="tabHandle(index)"
 				>
 				<view class="page-home-vscroll__text">
 					{{item.name}}
@@ -20,9 +20,9 @@
 			</view>
 		</scroll-view>
 		<!-- cell -->
-        <i-cell-group>
+       <!-- <i-cell-group>
 			<i-cell :arrow="false">为您推荐</i-cell>
-		</i-cell-group>
+		</i-cell-group> -->
 		<!-- list -->
 		<view class="article-list">
 			<!-- <view class="article-list__item" hover-class="is-hover">
@@ -41,7 +41,7 @@
 					<view class="article-list__fnum"><view class="iconfont icon-pinglun"></view>326</view>
 				</view>
 			</view> -->
-			<view class="article-list__item" hover-class="is-hover" v-for="(item,index) in currentData">
+			<view class="article-list__item" hover-class="is-hover" v-for="(item,index) in currentData" :key="index">
 				<view class="article-list__userinfo">
 					<view class="article-list__userinfo--left">
 						<view class="article-list__avatar"><image :src="item.author.avatar_url" ></image></view>
@@ -58,7 +58,7 @@
 				</view>
 			</view>
 		</view>
-		
+		<load-more :loading-type="loadingType" :content-text="loadingText"></load-more>
     </view>
 </template>
 <script>
@@ -70,19 +70,22 @@ dayjs.extend(relativeTime)
 import {interfaces} from '@/common/api.js'
 import iCellGroup from '@/components/i-cell-group.vue';
 import iCell from '@/components/i-cell.vue';
+import loadMore from '@/components/uni-load-more.vue'
 export default {
     components: {
         iCellGroup,
-        iCell
+        iCell,
+		loadMore
     },
     data() {
         return {
+			loadingType:0,
             loadingText: {
                 contentdown: '上拉显示更多',
                 contentrefresh: '正在加载...',
                 contentnomore: '没有更多数据了'
             },
-			tabIndex:'all',
+			tabIndex:0,
             tabBars: [
                 {
                     name: '全部',
@@ -109,81 +112,112 @@ export default {
                     id: 'dev'
                 }
             ],
-			list:{
-				'all':[],
-				'good':[],
-				'share':[],
-				'ask':[],
-				'job':[],
-				'dev':[]
-			},
-			currentData:[]
+			list:[
+				{
+					id:'all',
+					label:'全部',
+					top:0,
+					data:[]
+				},
+				{
+					id:'good',
+					label:'精华',
+					top:0,
+					data:[]
+				},
+				{
+					id:'share',
+					label:'分享',
+					top:0,
+					data:[]
+				},
+				{
+					id:'ask',
+					label:'问答',
+					top:0,
+					data:[]
+				},
+				{
+					id:'job',
+					label:'招聘',
+					top:0,
+					data:[]
+				},
+				{
+					id:'dev',
+					label:'测试',
+					top:0,
+					data:[]
+				}
+			],
+			currentData:[],
+			scrollTop:0
+			
         };
     },
     onLoad: function() {
 		var self = this;
-		var id='all';
-		uni.request({
-			url:interfaces.topics,
-			data:{
-				limit:5,
-				tab:'all',
-				mdrender:false
-			},
-			success(res) {
-				if(res.statusCode>=200 && res.statusCode<300){
-					
-					self.list[id]=res.data.data.map((item)=>{
-						item.create_at=dayjs().to(dayjs(item.create_at))
-						return item
-					})
-					self.currentData=self.list[id]
-				}
-				
-			}
-		})
+		
+		self.loadData(0)
 	},
 	onPageScroll(e) {
-		
+		this.scrollTop=e.scrollTop
+		this.list[this.tabIndex].top=e.scrollTop
 	},
     methods: {
-		tabHandle(id){
+		tabHandle(index){
 			let self = this;
-			self.tabIndex=id
-			let data = {
-				all:'all',
-				good:'good',
-				share:'share',
-				ask:'ask',
-				job:'job',
-				dev:'dev'
-			}
-			if(self.list[id].length){
-				self.currentData=self.list[id]
-			}else{
-				uni.request({
-					url:interfaces.topics,
-					data:{
-						limit:5,
-						tab:data[id],
-						mdrender:false
-					},
-					success(res) {
-						if(res.statusCode>=200 && res.statusCode<300){
-							self.list[id]=res.data.data.map((item)=>{
-								item.create_at=dayjs().to(dayjs(item.create_at))
-								return item
-							})
-							self.currentData=self.list[id]
-							// self.currentData=res.data.data
-							// self.list[id] = res.data.data
-						}
-						
-					}
+			self.tabIndex=index
+			if(self.list[index].data.length){
+				self.currentData=self.list[index].data
+				self.$nextTick(function(){
+					uni.pageScrollTo({
+						scrollTop: self.list[index].top,
+						duration: 0
+					});
 				})
+				
+			}else{
+				self.loadData(index)
 			}
-			
+		},
+		loadData(index){
+			let self = this;
+			let id = self.tabBars[index].id;
+			uni.showLoading({
+				title:'加载中'
+			})
+			uni.request({
+				url:interfaces.topics,
+				data:{
+					limit:5,
+					tab:id,
+					mdrender:false
+				},
+				success(res) {
+					if(res.statusCode>=200 && res.statusCode<300){
+						self.list[index].data=res.data.data.map((item)=>{
+							item.create_at=dayjs().to(dayjs(item.create_at))
+							return item
+						})
+						self.currentData=self.list[index].data
+						self.$nextTick(function(){
+							uni.pageScrollTo({
+								scrollTop: self.list[index].top,
+								duration: 0
+							});
+						})
+					}
+					
+				},
+				complete() {
+					setTimeout(function(){
+						uni.hideLoading()
+					},500)
+				}
+			})
 		}
+		
 	}
 };
 </script>
