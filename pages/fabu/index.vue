@@ -3,11 +3,13 @@
         <image class="logo" src="../../static/logo.png"></image>
 		<view>
             <text class="title">{{title}}</text>
+			<!-- <view>{{isLogin}}</view> -->
         </view>
 	</view>
 </template>
 
 <script>
+	import {mapState,mapMutations} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -15,7 +17,12 @@
 			}
 		},
 		onLoad() {
-
+		
+		},
+		computed:{
+			...mapState([
+				'isLogin'
+			])
 		},
 		methods: {
 

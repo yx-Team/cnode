@@ -1,6 +1,6 @@
 <template>
 	<view class="load-more">
-		<view class="loading-img" v-show="loadingType === 1 && showImage">
+		<view class="loading-img" v-if="loadingType === 1 && showImage">
 			<view class="load1">
 				<view :style="{background:color}"></view>
 				<view :style="{background:color}"></view>

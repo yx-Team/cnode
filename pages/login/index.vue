@@ -5,7 +5,11 @@
 		</view>
 		<view class="page-login__form">
 			<view class="page-login__input">
-				<input type="text" @input="bindKeyInput" placeholder="请输入Access Token" focus />
+				<input type="text"  v-model="inputValue" placeholder="请输入Access Token" />
+				<!-- #ifndef H5 -->
+				<view class="saoma" @click="scanCode"><view class="iconfont icon-saoma "></view></view>
+				<!-- #endif -->
+				
 			</view>
 			<button class="page-login__btn" @click="login">登录</button>
 		</view>
@@ -23,21 +27,16 @@
 				inputValue:''
 			};
 		},
-		onLoad() {
-			
-			uni.getStorage({
-				key:'accessToken',
-				success(res) {
-					uni.navigateBack({
-						delta: 1
-					});
-				}
-			})
-		},
+
 		methods:{
 			login(){
 				if(this.inputValue.trim()){
-					this.$store.dispatch('getUserInfo',this.inputValue)
+					
+					this.$store.dispatch('getUserInfo',{accessToken:this.inputValue,callback:function(){
+						uni.navigateBack({
+							delta:1
+						})
+					}})
 				}else{
 					uni.showToast({
 						title:'access token不能为空',
@@ -47,6 +46,22 @@
 			},
 			bindKeyInput: function (e) {
 				this.inputValue = e.target.value
+			},
+			// 扫码登录
+			scanCode:function(){
+				var self = this;
+				uni.scanCode({
+					scanType:['qrCode'],
+					success: function (res) {
+						self.inputValue=res.result;
+						self.login()
+					},
+					fail(res) {
+						uni.showModal({
+							content:res.errMsg
+						})
+					}
+				});
 			}
 		}
 	}
@@ -74,6 +89,7 @@
 			padding-top: 60upx;
 		}
 		&__input{
+			position: relative;
 			width: 500upx;
 			height: 76upx;
 			line-height: 76upx;
@@ -85,6 +101,20 @@
 				height: 76upx;
 				line-height: 76upx;
 				font-size: 34upx;
+			}
+			.saoma{
+				position: absolute;
+				right: 0;
+				top: 0;
+				z-index: 9;
+				display: flex;
+				align-content: center;
+				justify-content: center;
+				height: 76upx;
+				width: 76upx;
+				.iconfont{
+					line-height: 76upx;
+				}
 			}
 		}
 		&__btn{

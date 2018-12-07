@@ -1,22 +1,26 @@
 <template>
 	<view class="page-me">
-    <view class="page-me__header">
+		<view class="page-me__header">
 			<view class="page-me__header--top">
 				<!-- 头像 -->
 				<view class="page-me-avatar">
 					<view class="page-me-avatar__thumb">
-						<view class="page-me-avatar__thumbcon" v-if="$store.state.isLogin">
-							<image :src="$store.state.userInfo.avatar_url" mode=""></image>
+						<block v-if="isLogin === true">
+						<view class="page-me-avatar__thumbcon">
+							<image :src="userInfo.avatar_url" mode=""></image>
 						</view>
-						<view class="page-me-avatar__thumbcon" v-else @click="goLogin">
+						</block>
+						<block v-if="isLogin === false">
+						<view class="page-me-avatar__thumbcon"  @click="goLogin">
 							<view class="page-me-avatar__button">
 								去登录
 							</view>
 						</view>
+						</block>
 						
 					</view>
-					<view class="page-me-avatar__username" v-if="$store.state.isLogin">
-						{{$store.state.userInfo.loginname}}
+					<view class="page-me-avatar__username" v-if="isLogin === true">
+						{{userInfo.loginname}}
 					</view>
 				</view>
 			</view>
@@ -34,7 +38,7 @@
 					<view class="page-me-tools__text">最近回复</view>
 				</view>
 			</view>
-    </view>
+		</view>
 		<i-cell-group>
 			<i-cell icon="iconfont icon-appstore" icon-color="#ffae36"  @click="theme">主题</i-cell>
 			<i-cell icon="iconfont icon-exclamationcircle" icon-color="#51beeb">关于Cnode</i-cell>
@@ -44,12 +48,16 @@
 			<i-cell icon="iconfont icon-edit" icon-color="#ee7272"  @click="theme">关于作者</i-cell>
 			<i-cell icon="iconfont icon-sharealt" icon-color="#616e77">清理缓存</i-cell>
 		</i-cell-group>
+		<view class="logout" @click="logout" v-if="isLogin === true">
+			退出登录
+		</view>
 	</view>
 </template>
 
 <script>
 import iCellGroup from '@/components/i-cell-group';
 import iCell from '@/components/i-cell';
+import {mapState,mapActions,mapMutations} from 'vuex'
 export default {
     components: {
         iCell,
@@ -62,29 +70,42 @@ export default {
     },
     onLoad() {
         this.checkLogin()
-    },
-    methods: {
-			goLogin(){
-				uni.navigateTo({
-					url:'/pages/login/index'
-				})
-			},
-			checkLogin() {
-					var self = this;
-					uni.getStorage({
-						key:'accessToken',
-						success(res) {
-							self.$store.dispatch('getUserInfo',res.data)
-						},
-						fail() {
-							console.log('获取token失败')
-						}
-					})
-					
-			},
-			theme() {
-					alert('主题');
+		console.log('--------------------')
+		console.log(this.$store.state)
+		uni.getStorage({
+			'key':'accessToken',
+			success(res) {
+				console.log(res.data)
 			}
+		})
+		console.log(this.$store.state.isLogin)
+    },
+	computed: {
+		...mapState(['isLogin','userInfo'])
+	},
+    methods: {
+		...mapActions([
+			'logout'
+		]),
+		goLogin(){
+			uni.navigateTo({
+				url:'/pages/login/index'
+			})
+		},
+		checkLogin() {
+			var self = this;
+			uni.getStorage({
+				key:'accessToken',
+				success(res) {
+					self.$store.dispatch('getUserInfo',{accessToken:res.data})
+				},
+				fail() {
+					console.log('获取token失败')
+				}
+			})
+				
+		}
+			
     }
 };
 </script>
@@ -169,5 +190,17 @@ export default {
             color: #fff;
         }
     }
+	.logout{
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 710upx;
+		height: 84upx;
+		margin: 40upx auto 0;
+		background-color: #de3232;
+		border-radius: 5upx;
+		font-size: 32upx;
+		color: #f4f3f3;
+	}
 }
 </style>

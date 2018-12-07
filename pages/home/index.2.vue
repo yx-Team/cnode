@@ -20,25 +20,59 @@
 				</view>
 			</view>
 		</scroll-view>
-
-		<article-list :data="currentData.list"></article-list>
-
+		<!-- cell -->
+       <!-- <i-cell-group>
+			<i-cell :arrow="false">为您推荐</i-cell>
+		</i-cell-group> -->
+		<!-- list -->
+		<view class="article-list">
+			<!-- <view class="article-list__item" hover-class="is-hover">
+				<view class="article-list__userinfo">
+					<view class="article-list__userinfo--left">
+						<view class="article-list__avatar"><image src="../../static/logo.png" ></image></view>
+						<view class="article-list__username">Mr.xasd</view>
+					</view>
+					<view class="article-list__time">1小时前</view>
+				</view>
+				<view class="article-list__title i-ellipsis">Egg 2.0 正式发布，性能提升 30%，拥抱 Async,更加规范，更加快速</view>
+				<view class="article-list__desc i-ellipsis-2">Egg 是阿里 Node.js 的核心基础框架，面向『企业级的 Web 基础框架』这个领域，提供了「微内核 + 插件机制 + 框架定制能力」，完美达成生态共建和差异化定制的平衡点。</view>
+				<view class="article-list__footer">
+					<view class="article-list__label good">精华</view>
+					<view class="article-list__fnum"><view class="iconfont icon-eye"></view>326</view>
+					<view class="article-list__fnum"><view class="iconfont icon-pinglun"></view>326</view>
+				</view>
+			</view> -->
+			<view class="article-list__item" hover-class="is-hover" v-for="(item,index) in currentData.list" :key="index" @click="toDetail(item.id)">
+				<view class="article-list__userinfo">
+					<view class="article-list__userinfo--left">
+						<view class="article-list__avatar"><image :src="item.author.avatar_url" ></image></view>
+						<view class="article-list__username">{{item.author.loginname}}</view>
+					</view>
+					<view class="article-list__time">{{item.create_at}}</view>
+				</view>
+				<view class="article-list__title i-ellipsis-2">{{item.title}}</view>
+				<view class="article-list__desc i-ellipsis-2">{{item.content}}</view>
+				<view class="article-list__footer">
+					<view class="article-list__label" :class="item.tab">{{item.label}}</view>
+					<view class="article-list__fnum"><view class="iconfont icon-eye"></view>{{item.visit_count}}</view>
+					<view class="article-list__fnum"><view class="iconfont icon-pinglun"></view>{{item.reply_count}}</view>
+				</view>
+			</view>
+		</view>
 		<load-more :loading-type="loadingType" :content-text="loadingText"></load-more>
     </view>
 </template>
 <script>
 import { formateTime } from '@/lib/dayjs.js';
-import {topics} from '@/common/interface.js';
+import { interfaces } from '@/common/api.js';
+import {ntopics} from '@/common/interface.js';
 import iCellGroup from '@/components/i-cell-group.vue';
 import iCell from '@/components/i-cell.vue';
-import articleList from '@/business/article-list.vue';
-
 import loadMore from '@/components/uni-load-more.vue';
 export default {
     components: {
         iCellGroup,
         iCell,
-				articleList,
         loadMore
     },
     data() {
@@ -118,87 +152,20 @@ export default {
             ],
             currentData: {
                 id: 'all',
-                list: [{
-									id: '01',
-									author_id: '01',
-									tab: 'ask',
-									content:'',
-									title: '',
-									last_reply_at: '2018-12-05T02:22:22.204Z',
-									good: false,
-									top: false,
-									reply_count: 1,
-									visit_count: 235,
-									create_at: '1小时前',
-									author: {
-										loginname: '',
-										avatar_url: ''
-									},
-									default:true
-								},
-								{
-									id: '02',
-									author_id: '02',
-									tab: 'ask',
-									content:'',
-									title: '',
-									last_reply_at: '2018-12-05T02:22:22.204Z',
-									good: false,
-									top: false,
-									reply_count: 1,
-									visit_count: 235,
-									create_at: '2小时前',
-									author: {
-										loginname: '',
-										avatar_url: ''
-									},
-									default:true
-								},{
-									id: '03',
-									author_id: '03',
-									tab: 'ask',
-									content:'',
-									title: '',
-									last_reply_at: '2018-12-05T02:22:22.204Z',
-									good: false,
-									top: false,
-									reply_count: 1,
-									visit_count: 235,
-									create_at: '3小时前',
-									author: {
-										loginname: '',
-										avatar_url: ''
-									},
-									default:true
-								},{
-									id: '04',
-									author_id: '04',
-									tab: 'ask',
-									content:'',
-									title: '',
-									last_reply_at: '2018-12-05T02:22:22.204Z',
-									good: false,
-									top: false,
-									reply_count: 1,
-									visit_count: 235,
-									create_at: '4小时前',
-									author: {
-										loginname: '',
-										avatar_url: ''
-									},
-									default:true
-								}]
+                list: []
             },
-						isFirst:true,
             scrollTop: 0
         };
     },
     onLoad: function() {
         var self = this;
-				this.$store.dispatch('checkLogin')
         // uni.clearStorage()
         self.loadData(0, 1);
-				
+				ntopics({limit: 5,page: 1,tab: 'all',mdrender: false}).then(res=>{
+					console.log(res);
+				}).catch(error=>{
+					console.log(res);
+				})
     },
     onPageScroll(e) {
         this.scrollTop = e.scrollTop;
@@ -254,60 +221,63 @@ export default {
             let dpage = page || 1;
             let list = self.list[index];
             self.loadingType = 1;
-						topics({
-							limit: 5,
-							page: dpage,
-							tab: id,
-							mdrender: false
-            }).then(res=>{
-							console.log(res);
-							if (res.statusCode >= 200 && res.statusCode < 300) {
-								let resData = res.data.data
-								if (!resData.length) {
-										self.loadingType = 2;
-										return;
-								}
-								let getData = [];
-								getData = resData.map(item => {
-										// 转换日期
-										item.create_at = formateTime(item.create_at);
-										item.label = self.getLabel(item.tab);
-										return item;
-								});
+            uni.request({
+                url: interfaces.topics,
+                data: {
+                    limit: 5,
+                    page: dpage,
+                    tab: id,
+                    mdrender: false
+                },
+                success(res) {
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        if (!res.data.data.length) {
+                            self.loadingType = 2;
+                            return;
+                        }
+                        let getData = [];
+                        getData = res.data.data.map(item => {
+                            // 转换日期
+                            item.create_at = formateTime(item.create_at);
+                            item.label = self.getLabel(item.tab);
+                            return item;
+                        });
 
-								if (self.tabBars[index].id === self.currentData.id) {
-									if(self.isFirst){
-										self.isFirst=false
-										self.currentData.list = getData;
-										self.page++;
-										console.log('xxxx');
-									}else{
-										self.currentData.list = self.currentData.list.concat(getData);
-										self.page++;
-										console.log('yyyy');
-									}
-										
-								} else {
-										
-										self.currentData.list=[];
-										self.$nextTick(function(){
-											self.currentData.list = getData;
-											self.page = 2;
-											self.currentData.id = self.tabBars[index].id;
-											uni.pageScrollTo({
-													scrollTop: 0,
-													duration: 0
-											});
-										})
-										
-										console.log('zzz');
-								}
-								setTimeout(function(){
-									uni.hideLoading();
-								},1000)
-							}
-						})
-            
+                        if (self.tabBars[index].id === self.currentData.id) {
+                            self.currentData.list = self.currentData.list.concat(getData);
+                            self.page++;
+                        } else {
+														
+														self.currentData.list=[];
+														self.$nextTick(function(){
+															self.currentData.list = getData;
+															self.page = 2;
+															self.currentData.id = self.tabBars[index].id;
+															uni.pageScrollTo({
+																	scrollTop: 0,
+																	duration: 0
+															});
+														})
+                            
+                            
+                        }
+												setTimeout(function(){
+													uni.hideLoading();
+												},1000)
+                    }
+                },
+                fail(res) {
+                    console.log(res);
+                },
+                complete() {
+                    
+                }
+            });
+        },
+        toDetail(id) {
+            uni.navigateTo({
+                url: '/pages/detail/detail?id=' + id
+            });
         }
     }
 };
@@ -385,7 +355,6 @@ export default {
     &__item {
         position: relative;
         padding: 20upx 30upx 30upx 30upx;
-				background: #fff;
         &.is-hover {
             background: #f8f8f8;
         }

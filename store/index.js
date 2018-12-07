@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import {accesstoken} from '@/common/interface.js'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -22,36 +22,52 @@ const store = new Vuex.Store({
 	},
 	actions: {
 		// 获取用户信息
-		getUserInfo({commit,state},accessToken) {
-			console.log(accessToken);
-			uni.request({
-				method: 'POST',
-				url: 'https://cnodejs.org/api/v1/accesstoken',
-				data: {
-					'accesstoken': accessToken
-				},
-				success(res) {
+		getUserInfo({commit,state},payload) {
+			let {accessToken,callback} = payload
+			
+			accesstoken({'accesstoken': accessToken}).then(res=>{
+				if(res.statusCode===200 && res.data.success){
+					commit('SET_USER_INFO',res.data)
+					commit('SET_ACCESS_TOKEN',accessToken)
+					commit('SET_LOGIN',true)
+					uni.setStorage({
+						key:'accessToken',
+						data:accessToken,
+						success() {
+							if(callback){
+								callback()
+							}
+						}
+					})
 					
-					if(res.statusCode===200 && res.data.success){
-						commit('SET_USER_INFO',res.data)
-						commit('SET_ACCESS_TOKEN',accessToken)
-						commit('SET_LOGIN',true)
-						uni.setStorage({
-							key:'accessToken',
-							data:accessToken
-						})
-						uni.switchTab({
-							url:'/pages/me/index'
-						})
-					}else{
-						uni.showToast({
-							title:res.data.error_msg,
-							icon:'none'
-						})
-					}
+				}else{
+					uni.showToast({
+						title:res.data.error_msg,
+						icon:'none'
+					})
 				}
 			})
 		},
+		checkLogin({commit,dispatch}){
+			uni.getStorage({
+				key:'accessToken',
+				success(res) {
+					console.log(res);
+					dispatch('getUserInfo',{accessToken:res.data})
+				},
+				fail() {
+					console.log('获取token失败')
+				}
+			})
+		},
+		// 注销
+		logout({commit}){
+			console.log('注销')
+			commit('SET_USER_INFO',{})
+			commit('SET_ACCESS_TOKEN','')
+			commit('SET_LOGIN',false)
+			uni.clearStorage()
+		}
 	}
 })
 

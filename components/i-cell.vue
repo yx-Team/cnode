@@ -6,7 +6,7 @@
 		</view>
 		<view class="i-cell__right">
 			<view class="i-cell__value">{{value}}</view>
-			<view class="i-cell__arrow iconfont" v-if="arrow">&#xe604;</view>
+			<view class="i-cell__arrow iconfont icon-gengduo" v-if="arrow"></view>
 		</view>
 		
 	</view>

@@ -28,9 +28,14 @@
         {
             "path" : "pages/login/index",
             "style" : {
-            	"navigationBarTitleText" : ""
-				
+                "navigationBarTitleText" : ""
             }
+        },
+        {
+            "path" : "pages/detail/detail",
+            "style" : {
+				"navigationBarTitleText":"详情"
+			}
         }
     ],
     "globalStyle" : {
