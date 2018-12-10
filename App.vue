@@ -1,6 +1,7 @@
 <script>
 	export default {
 		onLaunch: function () {
+			this.$store.dispatch('checkLogin')
 			console.log('App Launch')
 		},
 		onShow: function () {

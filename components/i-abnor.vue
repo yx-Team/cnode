@@ -1,6 +1,6 @@
 <template>
 	<view class="i-abnor" :style="{height:height}">
-		<image class="i-abnor__thumb" :src="thumb" :style="thumbStyle"></image>
+		<image class="i-abnor__thumb" :src="thumb" :style="{width:'280upx',height:'220upx'}" mode='scaleToFill'></image>
 		<view class="i-abnor__text" :style="textStyle">{{text}}</view>
 		<slot></slot>
 	</view>
@@ -41,6 +41,8 @@
 		align-items: center;
 		justify-content: center;
 		&__thumb{
+			width:280upx;
+			height:220upx;
 			display: block;
 			margin-bottom: 30upx;
 		}

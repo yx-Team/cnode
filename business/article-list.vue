@@ -8,7 +8,7 @@
 			</view>
 			<view class="article-list__time">{{item.create_at}}</view>
 		</view>
-		<view class="article-list__title i-ellipsis-2">{{item.title}}</view>
+		<view class="article-list__title i-ellipsis-2"><text v-if="item.top">【置顶】</text><text v-if="item.good">【精华】</text>{{item.title}}</view>
 		<view class="article-list__desc i-ellipsis-2">{{item.content}}</view>
 		<view class="article-list__footer">
 			<view class="article-list__label" :class="item.tab">{{item.label}}</view>
@@ -272,6 +272,9 @@ export default {
 	        &.job {
 	            background-color: #49caca;
 	        }
+			&.dev {
+				background-color: #1aa034;
+			}
 	    }
 	    &__fnum {
 	        display: flex;

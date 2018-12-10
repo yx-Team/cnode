@@ -195,7 +195,7 @@ export default {
     },
     onLoad: function() {
         var self = this;
-				this.$store.dispatch('checkLogin')
+				
         // uni.clearStorage()
         self.loadData(0, 1);
 				
